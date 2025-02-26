@@ -10,6 +10,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AuthModule);
   const configService = app.get(ConfigService);
 
+  app.setGlobalPrefix('api');
+
   const documentOptions = new DocumentBuilder()
     .setTitle('Job Offer Connector App')
     .setDescription('Authentication Manager')
