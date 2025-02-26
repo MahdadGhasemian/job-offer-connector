@@ -25,4 +25,4 @@ import { CronsModule } from './crons/crons.module';
     CronsModule,
   ],
 })
-export class AuthModule {}
+export class AppModule {}

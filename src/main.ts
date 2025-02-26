@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { AuthModule } from './app.module';
+import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
@@ -7,7 +7,7 @@ import { Logger } from 'nestjs-pino';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AuthModule);
+  const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
   app.setGlobalPrefix('api');
