@@ -2,7 +2,6 @@ import { Logger, NotFoundException } from '@nestjs/common';
 import { AbstractEntity } from './abstract.entity';
 import {
   EntityManager,
-  FindOptionsOrder,
   FindOptionsRelations,
   FindOptionsWhere,
   Repository,
@@ -28,7 +27,7 @@ export abstract class AbstractRepository<T extends AbstractEntity<T>> {
   async findOneNoCheck(
     where: FindOptionsWhere<T>,
     relations?: FindOptionsRelations<T>,
-  ): Promise<T | null> {
+  ): Promise<T> {
     return this.entityRepository.findOne({ where, relations });
   }
 
@@ -63,24 +62,8 @@ export abstract class AbstractRepository<T extends AbstractEntity<T>> {
     return this.findOne(where);
   }
 
-  async update(
-    where: FindOptionsWhere<T>,
-    partialEntity: QueryDeepPartialEntity<T>,
-  ) {
-    return this.entityRepository.update(where, partialEntity);
-  }
-
   async find(where: FindOptionsWhere<T>, relations?: FindOptionsRelations<T>) {
     return this.entityRepository.find({ where, relations });
-  }
-
-  async findAndCount(
-    where: FindOptionsWhere<T>,
-    order: object,
-    skip: number,
-    take: number,
-  ) {
-    return this.entityRepository.findAndCount({ where, order, skip, take });
   }
 
   async findBy(where: FindOptionsWhere<T>) {
@@ -88,32 +71,6 @@ export abstract class AbstractRepository<T extends AbstractEntity<T>> {
   }
 
   async findOneAndDelete(where: FindOptionsWhere<T>) {
-    await this.entityRepository.softDelete(where);
-  }
-
-  async findLast(
-    where: FindOptionsWhere<T>,
-    relations?: FindOptionsRelations<T>,
-  ): Promise<T | null> {
-    const entities = await this.entityRepository.find({
-      where,
-      order: { id: 'DESC' } as FindOptionsOrder<T>,
-      take: 1,
-      relations,
-    });
-
-    return entities?.length ? entities[0] : null;
-  }
-
-  async count(): Promise<number> {
-    return this.entityRepository.count();
-  }
-
-  async countBy(where: FindOptionsWhere<T>): Promise<number> {
-    return this.entityRepository.countBy(where);
-  }
-
-  async runInTransaction<R>(run: () => Promise<R>): Promise<R> {
-    return this.entityManager.transaction(run);
+    await this.entityRepository.delete(where);
   }
 }

@@ -9,11 +9,13 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PGDATA: /data/postgres
-      POSTGRES_MULTIPLE_DATABASES: joboffersconnector
+      POSTGRES_MULTIPLE_DATABASES: app
     volumes:
-      - postgres_data_job_offer_connector:/data/postgres
+      - postgres_data:/data/postgres
     ports:
-      - '5442:5432'
+      - '5436:5432'
+    logging:
+      driver: none
     entrypoint: >
       /bin/bash -c "
       set -e;
@@ -34,15 +36,15 @@ services:
     environment:
       PGADMIN_LISTEN_PORT: 8080
     volumes:
-      - pgadmin_data_job_offer_connector:/var/lib/pgadmin
+      - pgadmin_data:/var/lib/pgadmin
     ports:
-      - '8088:8080'
-    # logging:
-    #   driver: none
-    # attach: false
+      - '8087:8080'
+    logging:
+      driver: none
+    attach: false
     depends_on:
       - postgres
 
 volumes:
-  postgres_data_job_offer_connector:
-  pgadmin_data_job_offer_connector:
+  postgres_data:
+  pgadmin_data:
