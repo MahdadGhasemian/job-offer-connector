@@ -1,22 +1,40 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { CurrencyType, EmploymentType, JobTransformer } from '@app/common';
 import { JobOffersService } from 'src/job-offers/job-offers.service';
+import { ConfigService } from '@nestjs/config';
+import { CronJob } from 'cron';
+import { SchedulerRegistry } from '@nestjs/schedule';
 
 @Injectable()
-export class CronsService {
+export class CronsService implements OnModuleInit {
   protected readonly logger = new Logger(CronsService.name);
+  private cronJob: CronJob;
 
   constructor(
     private readonly jobTransformer: JobTransformer,
     private readonly jobOffersService: JobOffersService,
+    private readonly configService: ConfigService,
+    private readonly schedulerRegistry: SchedulerRegistry,
   ) {}
 
-  //
-  @Cron(CronExpression.EVERY_10_SECONDS)
-  async handleJob() {
-    this.logger.debug('Fetching jobs...');
-    this.fetchJob();
+  onModuleInit() {
+    const cronExpression = this.getCronInterval();
+
+    // Create a new cron job
+    this.cronJob = new CronJob(cronExpression, async () => {
+      this.logger.debug('Fetching jobs...');
+      await this.fetchJob();
+    });
+
+    // Add the cron job to the scheduler
+    this.schedulerRegistry.addCronJob('job-fetcher', this.cronJob);
+
+    // Start the cron job
+    this.cronJob.start();
+  }
+
+  private getCronInterval(): string {
+    return this.configService.get('JOB_CRON_EXPRESSION', '*/10 * * * * *');
   }
 
   private async fetchJob() {
