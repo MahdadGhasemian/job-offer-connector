@@ -13,6 +13,13 @@ import {
 
 export class CreateJobOfferDto {
   @ApiProperty({
+    example: 'Provider 1',
+    required: true,
+  })
+  @IsString()
+  provider_name?: string;
+
+  @ApiProperty({
     example: 'Job ID 1',
     required: true,
   })

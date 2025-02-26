@@ -15,6 +15,7 @@ export const PROVIDER_CONFIGS: ProviderConfig[] = [
     apiUrl: 'https://assignment.devotel.io/api/provider1/jobs',
     jobListPath: 'jobs',
     mappings: {
+      provider_name: "'provider1'",
       job_id: 'jobId',
       title: 'title',
       location: 'details.location',
@@ -32,10 +33,11 @@ export const PROVIDER_CONFIGS: ProviderConfig[] = [
   },
   // Provider 2
   {
-    providerName: 'provider1',
+    providerName: 'provider2',
     apiUrl: 'https://assignment.devotel.io/api/provider2/jobs',
     jobListPath: 'data.jobsList',
     mappings: {
+      provider_name: "'provider2'",
       job_id: '@key',
       title: 'position',
       location: "join(', ', [location.city, location.state])",

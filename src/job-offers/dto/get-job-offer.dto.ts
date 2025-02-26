@@ -22,6 +22,14 @@ export class GetJobOfferDto extends AbstractGetDto {
   id?: number;
 
   @ApiProperty({
+    example: 'Provider 1',
+    required: true,
+  })
+  @IsString()
+  @Expose()
+  provider_name?: string;
+
+  @ApiProperty({
     example: 'Job ID 1',
     required: true,
   })

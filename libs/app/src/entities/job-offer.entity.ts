@@ -4,6 +4,9 @@ import { Column, Entity, Index } from 'typeorm';
 @Entity('job_offers')
 export class JobOffer extends AbstractEntity<JobOffer> {
   @Column()
+  provider_name: string;
+
+  @Column()
   job_id: string;
 
   @Column()

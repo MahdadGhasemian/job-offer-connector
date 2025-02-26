@@ -1,4 +1,5 @@
 export interface StandardizedJob {
+  provider_name: string;
   job_id: string;
   title: string;
   location: string;
