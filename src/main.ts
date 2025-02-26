@@ -14,7 +14,7 @@ async function bootstrap() {
 
   const documentOptions = new DocumentBuilder()
     .setTitle('Job Offer Connector App')
-    .setDescription('Authentication Manager')
+    .setDescription('Job Offer Manager')
     .setVersion('1.0')
     .addServer(
       `${configService.getOrThrow<string>('SWAGGER_SERVER_HOST')}`,
