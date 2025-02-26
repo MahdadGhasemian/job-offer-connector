@@ -4,7 +4,6 @@ import { JobOffersRepository } from './job-offers.repository';
 import { paginate, PaginateQuery } from 'nestjs-paginate';
 import { JOB_OFFER_PAGINATION_CONFIG } from './pagination-config';
 import { GetJobOfferDto } from './dto/get-job-offer.dto';
-import { UpdateJobOfferDto } from './dto/update-job-offer.dto';
 import { JobOffer } from '@app/app';
 
 @Injectable()
@@ -51,22 +50,5 @@ export class JobOffersService {
     return this.jobOffersRepository.findOne({
       ...getJobOfferDto,
     });
-  }
-
-  async update(id: number, updateJobOfferDto: UpdateJobOfferDto) {
-    const updateData: Partial<JobOffer> = {
-      ...updateJobOfferDto,
-    };
-
-    const result = await this.jobOffersRepository.findOneAndUpdate(
-      { id },
-      { ...updateData },
-    );
-
-    return this.findOne({ id: result.id });
-  }
-
-  async remove(id: number) {
-    return this.jobOffersRepository.findOneAndDelete({ id });
   }
 }
