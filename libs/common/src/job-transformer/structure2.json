@@ -1,0 +1,35 @@
+{
+  "status": "success",
+  "data": {
+    "jobsList": {
+      "job-635": {
+        "position": "Frontend Developer",
+        "location": { "city": "Austin", "state": "NY", "remote": false },
+        "compensation": { "min": 61000, "max": 123000, "currency": "USD" },
+        "employer": {
+          "companyName": "TechCorp",
+          "website": "https://creativedesign ltd.com"
+        },
+        "requirements": {
+          "experience": 4,
+          "technologies": ["Java", "Spring Boot", "AWS"]
+        },
+        "datePosted": "2025-02-23"
+      },
+      "job-297": {
+        "position": "Backend Engineer",
+        "location": { "city": "San Francisco", "state": "WA", "remote": true },
+        "compensation": { "min": 75000, "max": 121000, "currency": "USD" },
+        "employer": {
+          "companyName": "Creative Design Ltd",
+          "website": "https://dataworks.com"
+        },
+        "requirements": {
+          "experience": 1,
+          "technologies": ["Python", "Machine Learning", "SQL"]
+        },
+        "datePosted": "2025-02-14"
+      }
+    }
+  }
+}

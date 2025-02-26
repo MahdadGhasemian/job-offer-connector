@@ -1,0 +1,50 @@
+name: job_offer_connector
+
+services:
+  postgres:
+    image: postgres
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /data/postgres
+      POSTGRES_MULTIPLE_DATABASES: app
+    volumes:
+      - postgres_data:/data/postgres
+    ports:
+      - '5432:5432'
+    logging:
+      driver: none
+    entrypoint: >
+      /bin/bash -c "
+      set -e;
+      docker-entrypoint.sh postgres & 
+      sleep 5; 
+      IFS=',' read -ra DBS <<< \"$$POSTGRES_MULTIPLE_DATABASES\";
+      for db in \"$${DBS[@]}\"; do 
+        echo 'Creating database: ' $$db;
+        psql -U $$POSTGRES_USER -tc \"SELECT 1 FROM pg_database WHERE datname = '$$db'\" | grep -q 1 || psql -U $$POSTGRES_USER -c \"CREATE DATABASE $$db;\";
+      done;
+      wait
+      "
+
+  pgadmin4:
+    image: elestio/pgadmin
+    env_file:
+      - .env
+    environment:
+      PGADMIN_LISTEN_PORT: 8080
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    ports:
+      - '8080:8080'
+    logging:
+      driver: none
+    attach: false
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+  pgadmin_data:
