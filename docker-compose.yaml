@@ -13,7 +13,7 @@ services:
     volumes:
       - postgres_data:/data/postgres
     ports:
-      - '5436:5432'
+      - '5432:5432'
     logging:
       driver: none
     entrypoint: >
@@ -38,7 +38,7 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     ports:
-      - '8087:8080'
+      - '8080:8080'
     logging:
       driver: none
     attach: false
