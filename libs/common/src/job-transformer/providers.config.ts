@@ -1,12 +1,13 @@
-import { StandardizedJob } from './standardized-job.interface';
+import { CurrencyType, EmploymentType } from '../enum';
 
 export interface ProviderConfig {
   providerName: string;
   apiUrl: string;
   jobListPath: string;
   mappings: Record<string, string>;
-  defaults?: Partial<StandardizedJob>;
   slaryRangeRegex?: RegExp;
+  employmentTypeMap?: Record<string, EmploymentType>;
+  currenyMap?: Record<string, CurrencyType>;
 }
 
 export const PROVIDER_CONFIGS: ProviderConfig[] = [
@@ -27,10 +28,11 @@ export const PROVIDER_CONFIGS: ProviderConfig[] = [
       skills: 'skills',
       posted_date: 'postedDate',
     },
-    defaults: {
-      currency: 'USD',
-    },
     slaryRangeRegex: /\$(\d+)(k?)\s*-\s*\$(\d+)(k?)/,
+    employmentTypeMap: {
+      Contract: EmploymentType.CONTRACT,
+      'Full-Time': EmploymentType.FULL_TIME,
+    },
   },
   // Provider 2
   {
@@ -43,7 +45,6 @@ export const PROVIDER_CONFIGS: ProviderConfig[] = [
       title: 'position',
       location: "join(', ', [location.city, location.state])",
       remote: 'location.remote',
-      employment_type: "'Full-Time'", // Hardcoded assumption
       min_salary: 'compensation.min',
       max_salary: 'compensation.max',
       currency: 'compensation.currency',
@@ -52,6 +53,10 @@ export const PROVIDER_CONFIGS: ProviderConfig[] = [
       skills: 'requirements.technologies',
       experience: 'requirements.experience',
       posted_date: 'datePosted',
+    },
+    currenyMap: {
+      USD: CurrencyType.USD,
+      EUR: CurrencyType.EUR,
     },
   },
 ];

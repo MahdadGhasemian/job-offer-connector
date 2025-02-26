@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { CurrencyType, EmploymentType, JobTransformer } from '@app/common';
+import { JobTransformer } from '@app/common';
 import { JobOffersService } from 'src/job-offers/job-offers.service';
 import { ConfigService } from '@nestjs/config';
 import { CronJob } from 'cron';
@@ -47,8 +47,6 @@ export class CronsService implements OnModuleInit {
         // create job
         const result = await this.jobOffersService.create({
           ...job,
-          employment_type: EmploymentType.FULL_TIME,
-          currency: CurrencyType.USD,
         });
 
         this.logger.debug(`Created Job: ${result.id}`);

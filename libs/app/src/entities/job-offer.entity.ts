@@ -24,6 +24,7 @@ export class JobOffer extends AbstractEntity<JobOffer> {
     type: 'enum',
     enum: EmploymentType,
     default: EmploymentType.FULL_TIME,
+    nullable: true,
   })
   @Index()
   employment_type: EmploymentType;
@@ -38,6 +39,7 @@ export class JobOffer extends AbstractEntity<JobOffer> {
     type: 'enum',
     enum: CurrencyType,
     default: CurrencyType.USD,
+    nullable: true,
   })
   @Index()
   currency: CurrencyType;

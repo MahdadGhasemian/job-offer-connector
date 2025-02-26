@@ -4,6 +4,7 @@ import { PROVIDER_CONFIGS, ProviderConfig } from './providers.config';
 import { StandardizedJob } from './standardized-job.interface';
 import { lastValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
+import { CurrencyType, EmploymentType } from '../enum';
 
 @Injectable()
 export class JobTransformer {
@@ -52,20 +53,30 @@ export class JobTransformer {
 
     for (const [key, query] of Object.entries(providerConfig.mappings)) {
       transformedJob[key] =
-        query === '@key'
-          ? jobId
-          : (jmespath.search(job, query) ?? providerConfig.defaults?.[key]);
+        query === '@key' ? jobId : jmespath.search(job, query);
     }
 
+    //
     const { min_salary, max_salary } = this.extractSalaryIfNeeded(
       providerConfig.slaryRangeRegex,
       transformedJob.salary_range,
       transformedJob.min_salary,
       transformedJob.max_salary,
     );
-
     transformedJob.min_salary = min_salary;
     transformedJob.max_salary = max_salary;
+
+    //
+    transformedJob.currency = this.checkCurrencyIfNeeded(
+      transformedJob?.currency,
+      providerConfig?.currenyMap,
+    );
+
+    //
+    transformedJob.employment_type = this.checkEmploymentTypeMapIfNeeded(
+      transformedJob?.employment_type,
+      providerConfig?.employmentTypeMap,
+    );
 
     transformedJob.posted_date = new Date(transformedJob.posted_date as any);
 
@@ -100,5 +111,21 @@ export class JobTransformer {
     }
 
     return null;
+  }
+
+  private checkCurrencyIfNeeded(
+    currency: string | null,
+    currenyMap: Record<string, CurrencyType> | null,
+  ): CurrencyType | null {
+    return currenyMap && currency ? currenyMap[currency] : null;
+  }
+
+  private checkEmploymentTypeMapIfNeeded(
+    employment_type: string | null,
+    employmentTypeMap: Record<string, EmploymentType> | null,
+  ): EmploymentType | null {
+    return employmentTypeMap && employment_type
+      ? employmentTypeMap[employment_type]
+      : null;
   }
 }
