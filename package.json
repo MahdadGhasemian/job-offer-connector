@@ -88,10 +88,11 @@
     "testEnvironment": "node",
     "roots": [
       "<rootDir>/libs/",
-      "<rootDir>/apps/"
+      "<rootDir>/src/"
     ],
     "moduleNameMapper": {
-      "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1"
+      "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1",
+      "^@app/app(|/.*)$": "<rootDir>/libs/app/src/$1"
     }
   },
   "main": ".eslintrc.js",
