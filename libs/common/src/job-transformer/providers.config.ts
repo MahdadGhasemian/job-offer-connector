@@ -6,6 +6,7 @@ export interface ProviderConfig {
   jobListPath: string;
   mappings: Record<string, string>;
   defaults?: Partial<StandardizedJob>;
+  slaryRangeRegex?: RegExp;
 }
 
 export const PROVIDER_CONFIGS: ProviderConfig[] = [
@@ -20,8 +21,7 @@ export const PROVIDER_CONFIGS: ProviderConfig[] = [
       title: 'title',
       location: 'details.location',
       employment_type: 'details.type',
-      min_salary: 'details.salaryRange',
-      max_salary: 'details.salaryRange',
+      salary_range: 'details.salaryRange',
       company_name: 'company.name',
       industry: 'company.industry',
       skills: 'skills',
@@ -30,6 +30,7 @@ export const PROVIDER_CONFIGS: ProviderConfig[] = [
     defaults: {
       currency: 'USD',
     },
+    slaryRangeRegex: /\$(\d+)(k?)\s*-\s*\$(\d+)(k?)/,
   },
   // Provider 2
   {

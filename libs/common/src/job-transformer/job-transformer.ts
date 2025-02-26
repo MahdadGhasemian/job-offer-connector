@@ -12,6 +12,8 @@ export class JobTransformer {
   constructor(private readonly httpService: HttpService) {}
 
   async fetchProviders() {
+    const jobs = [];
+
     for (const provider of PROVIDER_CONFIGS) {
       try {
         const response = await lastValueFrom(
@@ -20,7 +22,7 @@ export class JobTransformer {
 
         const transformedJobs = this.transform(provider, response.data);
 
-        return transformedJobs;
+        jobs.push(...transformedJobs);
       } catch (error) {
         this.logger.error(
           `Error fetching jobs from ${provider.providerName}: ${error.message}`,
@@ -29,6 +31,8 @@ export class JobTransformer {
         throw error;
       }
     }
+
+    return jobs;
   }
 
   transform(providerConfig: ProviderConfig, response: any): StandardizedJob[] {
@@ -53,12 +57,15 @@ export class JobTransformer {
           : (jmespath.search(job, query) ?? providerConfig.defaults?.[key]);
     }
 
-    transformedJob.min_salary = this.extractSalaryIfNeeded(
+    const { min_salary, max_salary } = this.extractSalaryIfNeeded(
+      providerConfig.slaryRangeRegex,
+      transformedJob.salary_range,
       transformedJob.min_salary,
-    );
-    transformedJob.max_salary = this.extractSalaryIfNeeded(
       transformedJob.max_salary,
     );
+
+    transformedJob.min_salary = min_salary;
+    transformedJob.max_salary = max_salary;
 
     transformedJob.posted_date = new Date(transformedJob.posted_date as any);
 
@@ -66,24 +73,32 @@ export class JobTransformer {
   }
 
   private extractSalaryIfNeeded(
-    salaryRange: string | number | undefined,
-  ): number | undefined {
-    if (typeof salaryRange === 'string') {
-      const salary = this.extractSalary(salaryRange);
-      return salary.min;
+    regex: RegExp,
+    salary_range: string | undefined,
+    min_salary: number | undefined,
+    max_salary: number | undefined,
+  ): { min_salary: number; max_salary: number } | undefined {
+    if (salary_range && regex) {
+      const salary = this.extractSalary(salary_range, regex);
+
+      return { min_salary: salary.min, max_salary: salary.max };
     }
-    return salaryRange;
+
+    return { min_salary: +min_salary, max_salary: +max_salary };
   }
 
-  private extractSalary(salaryRange: string): { min: number; max: number } {
-    const match = salaryRange.match(
-      /\$(\d+(?:,\d{3})*)\s*-\s*\$(\d+(?:,\d{3})*)/,
-    );
-    return match
-      ? {
-          min: parseInt(match[1].replace(',', ''), 10),
-          max: parseInt(match[2].replace(',', ''), 10),
-        }
-      : { min: 0, max: 0 };
+  private extractSalary(
+    salaryRange: string,
+    regex: RegExp,
+  ): { min: number; max: number } | null {
+    const match = salaryRange.match(regex);
+    if (match) {
+      const minSalary = parseFloat(match[1]) * (match[2] === 'k' ? 1000 : 1);
+      const maxSalary = parseFloat(match[3]) * (match[4] === 'k' ? 1000 : 1);
+
+      return { min: minSalary, max: maxSalary };
+    }
+
+    return null;
   }
 }

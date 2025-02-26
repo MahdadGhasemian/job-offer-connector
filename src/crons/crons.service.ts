@@ -40,6 +40,7 @@ export class CronsService implements OnModuleInit {
   private async fetchJob() {
     try {
       const transformedJobs = await this.jobTransformer.fetchProviders();
+
       transformedJobs?.map(async (job) => {
         this.logger.debug(`Transformed Job: ${job.job_id} - ${job.title}`);
 

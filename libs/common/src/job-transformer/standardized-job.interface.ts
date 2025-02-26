@@ -5,6 +5,7 @@ export interface StandardizedJob {
   location: string;
   remote?: boolean;
   employment_type: string;
+  salary_range?: string;
   min_salary?: number;
   max_salary?: number;
   currency: string;
