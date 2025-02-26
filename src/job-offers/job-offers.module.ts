@@ -17,5 +17,6 @@ import { JobOffer } from '@app/app';
   ],
   controllers: [JobOffersController],
   providers: [JobOffersService, JobOffersRepository],
+  exports: [JobOffersService],
 })
 export class JobOffersModule {}

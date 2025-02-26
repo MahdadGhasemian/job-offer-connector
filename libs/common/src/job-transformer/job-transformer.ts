@@ -1,36 +1,56 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as jmespath from 'jmespath';
-import { PROVIDER_CONFIGS } from './providers.config';
+import { PROVIDER_CONFIGS, ProviderConfig } from './providers.config';
 import { StandardizedJob } from './standardized-job.interface';
+import { lastValueFrom } from 'rxjs';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class JobTransformer {
   private readonly logger = new Logger(JobTransformer.name);
 
-  transform(provider: string, response: any): StandardizedJob[] {
-    const config = PROVIDER_CONFIGS[provider];
-    if (!config) {
-      throw new Error(`Unknown provider: ${provider}`);
-    }
+  constructor(private readonly httpService: HttpService) {}
 
-    const jobs = jmespath.search(response, config.jobListPath) ?? [];
+  async fetchProviders() {
+    for (const provider of PROVIDER_CONFIGS) {
+      try {
+        const response = await lastValueFrom(
+          this.httpService.get(provider.apiUrl),
+        );
+
+        const transformedJobs = this.transform(provider, response.data);
+
+        return transformedJobs;
+      } catch (error) {
+        this.logger.error(
+          `Error fetching jobs from ${provider.providerName}: ${error.message}`,
+        );
+
+        throw error;
+      }
+    }
+  }
+
+  transform(providerConfig: ProviderConfig, response: any): StandardizedJob[] {
+    const jobs = jmespath.search(response, providerConfig.jobListPath) ?? [];
+
     return Object.entries(jobs).map(([jobId, job]: [string, any]) => {
-      return this.transformJob(job, config, jobId);
+      return this.transformJob(job, providerConfig, jobId);
     });
   }
 
   private transformJob(
     job: any,
-    config: (typeof PROVIDER_CONFIGS)['provider1'],
+    providerConfig: ProviderConfig,
     jobId: string,
   ): StandardizedJob {
     const transformedJob: Partial<StandardizedJob> = { raw_data: job };
 
-    for (const [key, query] of Object.entries(config.mappings)) {
+    for (const [key, query] of Object.entries(providerConfig.mappings)) {
       transformedJob[key] =
         query === '@key'
           ? jobId
-          : (jmespath.search(job, query) ?? config.defaults?.[key]);
+          : (jmespath.search(job, query) ?? providerConfig.defaults?.[key]);
     }
 
     transformedJob.min_salary = this.extractSalaryIfNeeded(

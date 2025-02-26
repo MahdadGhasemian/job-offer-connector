@@ -1,62 +1,41 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { lastValueFrom } from 'rxjs';
-import { HttpService } from '@nestjs/axios';
-import { JobTransformer } from '@app/common';
+import { CurrencyType, EmploymentType, JobTransformer } from '@app/common';
+import { JobOffersService } from 'src/job-offers/job-offers.service';
 
 @Injectable()
 export class CronsService {
   protected readonly logger = new Logger(CronsService.name);
-  private readonly jobProviders = [
-    {
-      providerName: 'provider1',
-      apiUrl: 'https://assignment.devotel.io/api/provider1/jobs',
-    },
-    {
-      providerName: 'provider2',
-      apiUrl: 'https://assignment.devotel.io/api/provider2/jobs',
-    },
-  ];
 
   constructor(
-    private readonly httpService: HttpService,
     private readonly jobTransformer: JobTransformer,
+    private readonly jobOffersService: JobOffersService,
   ) {}
 
-  // Runs every day at midnight
-  // @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  //
   @Cron(CronExpression.EVERY_10_SECONDS)
-  async handleMidnightJob() {
-    this.logger.log('Fetching jobs...');
+  async handleJob() {
+    this.logger.debug('Fetching jobs...');
     this.fetchJob();
   }
 
   private async fetchJob() {
-    this.logger.log('Fetching Job ---------------------------');
+    try {
+      const transformedJobs = await this.jobTransformer.fetchProviders();
+      transformedJobs?.map(async (job) => {
+        this.logger.debug(`Transformed Job: ${job.job_id} - ${job.title}`);
 
-    for (const provider of this.jobProviders) {
-      try {
-        const response = await lastValueFrom(
-          this.httpService.get(provider.apiUrl),
-        );
+        // create job
+        const result = await this.jobOffersService.create({
+          ...job,
+          employment_type: EmploymentType.FULL_TIME,
+          currency: CurrencyType.USD,
+        });
 
-        const transformedJobs = this.jobTransformer.transform(
-          provider.providerName,
-          response.data,
-        );
-        transformedJobs.forEach((job) => {
-          this.logger.log(`Transformed Job: ${job.job_id} - ${job.title}`);
-          console.log(job);
-        });
-        transformedJobs.forEach((job) => {
-          this.logger.log(`Transformed Job: ${job.job_id} - ${job.title}`);
-          console.log(job);
-        });
-      } catch (error) {
-        this.logger.error(
-          `Error fetching jobs from ${provider.providerName}: ${error.message}`,
-        );
-      }
+        this.logger.debug(`Created Job: ${result.id}`);
+      });
+    } catch (error) {
+      this.logger.error(`Error fetching jobs ${error.message}`);
     }
   }
 }

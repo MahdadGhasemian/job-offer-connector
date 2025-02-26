@@ -29,7 +29,7 @@ export class JobOffersService {
     );
   }
 
-  async findOne(getJobOfferDto: GetJobOfferDto) {
+  async findOne(getJobOfferDto: Omit<GetJobOfferDto, 'skills'>) {
     return this.jobOffersRepository.findOne({
       ...getJobOfferDto,
     });

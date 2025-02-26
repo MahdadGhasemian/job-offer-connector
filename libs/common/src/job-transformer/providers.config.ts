@@ -1,13 +1,18 @@
 import { StandardizedJob } from './standardized-job.interface';
 
-interface ProviderConfig {
+export interface ProviderConfig {
+  providerName: string;
+  apiUrl: string;
   jobListPath: string;
   mappings: Record<string, string>;
   defaults?: Partial<StandardizedJob>;
 }
 
-export const PROVIDER_CONFIGS: Record<string, ProviderConfig> = {
-  provider1: {
+export const PROVIDER_CONFIGS: ProviderConfig[] = [
+  // Provider 1
+  {
+    providerName: 'provider1',
+    apiUrl: 'https://assignment.devotel.io/api/provider1/jobs',
     jobListPath: 'jobs',
     mappings: {
       job_id: 'jobId',
@@ -25,7 +30,10 @@ export const PROVIDER_CONFIGS: Record<string, ProviderConfig> = {
       currency: 'USD',
     },
   },
-  provider2: {
+  // Provider 2
+  {
+    providerName: 'provider1',
+    apiUrl: 'https://assignment.devotel.io/api/provider2/jobs',
     jobListPath: 'data.jobsList',
     mappings: {
       job_id: '@key',
@@ -43,4 +51,4 @@ export const PROVIDER_CONFIGS: Record<string, ProviderConfig> = {
       posted_date: 'datePosted',
     },
   },
-};
+];
