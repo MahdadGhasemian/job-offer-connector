@@ -1,9 +1,9 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { JobTransformer } from '@app/common';
-import { JobOffersService } from 'src/job-offers/job-offers.service';
 import { ConfigService } from '@nestjs/config';
 import { CronJob } from 'cron';
 import { SchedulerRegistry } from '@nestjs/schedule';
+import { JobOffersService } from '../job-offers/job-offers.service';
 
 @Injectable()
 export class CronsService implements OnModuleInit {
